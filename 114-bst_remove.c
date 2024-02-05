@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include <stdio.h>
+#include "binary_trees.h"
 
 // Structure for a node in BST
 typedef struct bst_node {
