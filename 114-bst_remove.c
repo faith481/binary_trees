@@ -1,37 +1,44 @@
-#include <stdlib.h>
-#include <stdio.h>
 #include "binary_trees.h"
 
-/**
- * main - Entry point
- *
- * Return: 0 on success, error code on failure
- */
-int main(void)
-{
-    bst_t *tree;
-    int array[] = {
-        79, 47, 68, 87, 84, 91, 21, 32, 34, 2,
-        20, 22, 98, 1, 62, 95
-    };
-    size_t n = sizeof(array) / sizeof(array[0]);
+// Structure for a node in BST
+typedef struct bst_node {
+    int value;
+    struct bst_node *left;
+    struct bst_node *right;
+} bst_t;
 
-    tree = array_to_bst(array, n);
-    if (!tree)
-        return (1);
-    binary_tree_print(tree);
+// Function to find the minimum value node in a BST
+bst_t *find_min(bst_t *node) {
+    while (node->left != NULL)
+        node = node->left;
+    return node;
+}
 
-    tree = bst_remove(tree, 79);
-    printf("Removed 79...\n");
-    binary_tree_print(tree);
-
-    tree = bst_remove(tree, 21);
-    printf("Removed 21...\n");
-    binary_tree_print(tree);
-
-    tree = bst_remove(tree, 68);
-    printf("Removed 68...\n");
-    binary_tree_print(tree);
-    binary_tree_delete(tree);
-    return (0);
+// Function to remove a node from BST
+bst_t *bst_remove(bst_t *root, int value) {
+    if (root == NULL) // Base case: tree is empty or value not found
+        return NULL;
+    
+    if (value < root->value) // If value is smaller, go left
+        root->left = bst_remove(root->left, value);
+    else if (value > root->value) // If value is greater, go right
+        root->right = bst_remove(root->right, value);
+    else { // Value found, remove this node
+        // Case 1: Node has no children or only one child
+        if (root->left == NULL) {
+            bst_t *temp = root->right;
+            free(root);
+            return temp;
+        } else if (root->right == NULL) {
+            bst_t *temp = root->left;
+            free(root);
+            return temp;
+        }
+        
+        // Case 2: Node has two children
+        bst_t *temp = find_min(root->right); // Find in-order successor
+        root->value = temp->value; // Copy the successor's value to this node
+        root->right = bst_remove(root->right, temp->value); // Remove the successor
+    }
+    return root;
 }
